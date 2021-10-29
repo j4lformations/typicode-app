@@ -1,9 +1,13 @@
 const express = require('express');
 const dotenv = require('dotenv');
-const middlewares = require('./middlewares/middlewares');
+const createError = require('http-errors');
+const middlewares = require('./middlewares/index');
+const routers = require('./routes/index');
 
 // fichier .env
 dotenv.config();
+
+require('./config/database');
 
 // serveur express
 const app = express();
@@ -11,8 +15,7 @@ const app = express();
 // middlewares
 middlewares(app);
 
-app.get('/', function (req, res) {
-    res.send('Hello World')
-})
+// routes
+routers(app);
 
 module.exports = app;
