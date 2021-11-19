@@ -11,7 +11,8 @@ const UserSchema = new Schema({
         type: String,
         trim: true,
         required: [true, `Merci de renseigner votre prénom SVP !!!`],
-        maxlength: 20
+        maxlength: 20,
+        validate: [validator.isAlpha, 'Le prenom ne doit pas contenir de nombre !!!']
     },
     email: {
         type: String,
@@ -46,7 +47,10 @@ const UserSchema = new Schema({
     mdpResetExpires: Date,
     role: {
         type: String,
-        enum: ['admin', 'user', 'employe'],
+        enum: {
+            values: ['admin', 'employe', 'user'],
+            message: `La valeur {VALUE} est invalide !!!`
+        },
         default: []
     },
     historique: {
@@ -58,7 +62,11 @@ const UserSchema = new Schema({
         default: true,
         select: false
     }
-}, {timestamps: true});
+}, {
+    timestamps: true,
+    toJSON: {virtuals: true},
+    toObject: {virtuals: true}
+});
 
 // capitaliser le champ prenom avant une persistence
 UserSchema.pre('save', async function () {
@@ -80,6 +88,6 @@ UserSchema.pre('save', async function (next) {
     next();
 });
 
-UserSchema.plugin(beautifyUnique);
 
+UserSchema.plugin(beautifyUnique);
 module.exports = mongoose.model('User', UserSchema);

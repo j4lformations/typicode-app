@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const {promisify} = require('util');
 const User = require('../../models/users');
+const catchAsync = require('../../utils/catchAsync');
 
 // permet de generer un web token
 const signToken = (id) => {
@@ -39,22 +40,31 @@ const createAndSendToken = (user, statusCode, res) => {
         });
 }
 
-exports.formSignin = (req, res) => {
-    res
-        .status(200)
-        .json({
-            msg: `Formulaire d'authentification en attente de realisation !!!`
-        });
+// Affiche le formulaire de login
+exports.formSignin = async (req, res) => {
+    try {
+        res
+            .status(200)
+            .json({
+                msg: `Formulaire d'authentification en attente de realisation !!!`
+            });
+    } catch (e) {
+    }
 }
 
-exports.signin = (req, res) => {
-    res
-        .status(200)
-        .json({
-            msg: `Processus d'authentification en attente de realisation !!!`
-        });
+// processus de login
+exports.signin = async (req, res) => {
+    try {
+        res
+            .status(200)
+            .json({
+                msg: `Processus d'authentification en attente de realisation !!!`
+            });
+    } catch (error) {
+    }
 }
 
+// Affiche le formulaire d'enregistrement
 exports.formSignup = async (req, res) => {
     res
         .status(200)
@@ -63,25 +73,21 @@ exports.formSignup = async (req, res) => {
         });
 }
 
-exports.signup = async (req, res, next) => {
-    try {
-        const {prenom, email, mdp, confirmMdp, role} = await req.body;
-        let newUser = new User({
-            prenom: prenom,
-            email: email,
-            mdp: mdp,
-            confirmMdp: confirmMdp,
-            role: role
-        });
-        newUser = await newUser.save();
-        createAndSendToken(newUser, 200, res);
-    } catch (error) {
-        res
-            .status(500)
-            .json(error);
-    }
-}
+// processus d'enregistrement
+exports.signup = catchAsync(async (req, res, next) => {
+    const {prenom, email, mdp, confirmMdp, role} = await req.body;
+    let newUser = new User({
+        prenom: prenom,
+        email: email,
+        mdp: mdp,
+        confirmMdp: confirmMdp,
+        role: role
+    });
+    newUser = await newUser.save();
+    createAndSendToken(newUser, 200, res);
+});
 
+// processus de logout
 exports.logout = (req, res) => {
     res
         .status(200)
